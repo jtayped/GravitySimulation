@@ -1,5 +1,5 @@
 from ..config.constants import *
-import pygame
+import pygame, math
 
 class Mass:
     def __init__(
@@ -8,7 +8,8 @@ class Mass:
             pos: tuple, 
             speed=(0, 0),
             acceleration=(0, 0),
-            color: str = 'white'
+            color: str = 'white',
+            movement=True
             ) -> None:
         self.mass = mass
         self.radius = radius
@@ -16,6 +17,7 @@ class Mass:
         self.speed = speed
         self.acceleration = acceleration
         self.color = color
+        self.hasMovement = movement
 
         self.position = pygame.math.Vector2(
             pos[0], pos[1]
@@ -27,7 +29,11 @@ class Mass:
         self.acceleration = pygame.math.Vector2(
             acceleration[0], acceleration[1]
         )
-        
+
+    def volume(self):
+        # Calculate and return the volume of the sphere
+        return (4/3) * math.pi * (self.radius ** 3)
+    
     def calculateGravitationalForce(self, otherMass) -> pygame.math.Vector2:
         # Calculate the distance between the two masses
         r = otherMass.position - self.position
@@ -39,16 +45,6 @@ class Mass:
 
         return fVec
 
-    def handle_collision(self, other_mass):
-        # Check if the masses are colliding
-        distance = self.position.distance_to(other_mass.position)
-        if distance < self.radius + other_mass.radius:
-            # Elastic collision formula
-            relative_velocity = self.speed - other_mass.speed
-            impulse = 2 * self.mass * other_mass.mass / (self.mass + other_mass.mass) * relative_velocity
-            self.speed -= impulse / self.mass
-            other_mass.speed += impulse / other_mass.mass
-
     def movement(self, masses: list):
         # Calculate the interaction between masses
         total_force = pygame.math.Vector2(0, 0)
@@ -57,17 +53,13 @@ class Mass:
                 force = self.calculateGravitationalForce(mass)
                 total_force += force
 
-        # Handle collisions
-        for mass in masses:
-            if mass is not self:
-                self.handle_collision(mass)
+        if self.hasMovement:
+            # Modify the acceleration based on the total force
+            self.acceleration = total_force / self.mass
 
-        # Modify the acceleration based on the total force
-        self.acceleration = total_force / self.mass
-
-        # Modify the position
-        self.speed += self.acceleration
-        self.position += self.speed
+            # Modify the position
+            self.speed += self.acceleration
+            self.position += self.speed
 
     def draw(self, screen: pygame.Surface):
         pygame.draw.circle(screen, self.color, self.position, self.radius)
