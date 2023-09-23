@@ -19,6 +19,8 @@ class Mass:
         self.color = color
         self.hasMovement = movement
 
+        self.trajectory = []
+
         self.position = pygame.math.Vector2(
             pos[0], pos[1]
         )
@@ -47,22 +49,32 @@ class Mass:
 
     def movement(self, masses: list):
         # Calculate the interaction between masses
-        total_force = pygame.math.Vector2(0, 0)
+        self.total_force = pygame.math.Vector2(0, 0)
         for mass in masses:
             if mass is not self:
                 force = self.calculateGravitationalForce(mass)
-                total_force += force
+                self.total_force += force
 
         if self.hasMovement:
             # Modify the acceleration based on the total force
-            self.acceleration = total_force / self.mass
+            self.acceleration = self.total_force / self.mass
 
             # Modify the position
             self.speed += self.acceleration
             self.position += self.speed
 
+        self.trajectory.append(
+            (self.position.x, self.position.y)
+        )
+
     def draw(self, screen: pygame.Surface):
         pygame.draw.circle(screen, self.color, self.position, self.radius)
+        
+        if self.hasMovement and len(self.trajectory) > 2:
+            if len(self.trajectory) > 200:
+                self.trajectory.pop(0)
+
+            pygame.draw.lines(screen, 'white', False, self.trajectory, 2)
 
     def update(self, screen: pygame.Surface, masses: list):
         self.movement(masses)

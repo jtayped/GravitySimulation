@@ -13,7 +13,9 @@ class Universe:
         self.point1 = self.point2 = None
 
         self.masses = []
-        #self.masses.append(Mass(2.5e6, 30, (WIDTH//2, HEIGHT//2), movement=False))
+        self.masses.append(Mass(2.5e5, 10, (WIDTH*0.5, HEIGHT*0.5), movement=False))
+        #self.masses.append(Mass(10e3, 5, (WIDTH*0.5, HEIGHT*0.75), (-2.605, 0)))
+        self.masses.append(Mass(10e3, 5, (WIDTH*0.5125, HEIGHT*0.75), (-2.595, 0)))
 
     def handleCollisions(self, mass1: Mass, mass2: Mass):
         distance = mass2.position.distance_to(mass1.position)
@@ -83,11 +85,12 @@ class Universe:
                 dx = self.point1.x - self.point2.x
                 dy = self.point1.y - self.point2.y
 
-                speedX = dx/15
-                speedY = dy/15
+                speedX = dx/30
+                speedY = dy/30
 
-                self.masses.append(Mass(10e3, 10, self.point1, (-speedX, -speedY)))
+                self.masses.append(Mass(10e3, 5, self.point1, (-speedX, -speedY)))
 
+                print("\nMass: 10e3", "Radis: 10", f"Pos: {self.point1}", f"Speed: {-speedX} / {-speedY}")
                 self.point1 = self.point2 = None
 
     def update(self):
@@ -106,11 +109,11 @@ class Universe:
                 scaledVector = directionVector.normalize() * 1000
                 endpoint = self.point1 + scaledVector
 
-                pygame.draw.line(self.screen, 'green', point2, endpoint)
-                pygame.draw.circle(self.screen, 'white', point2, 5, 1)
+                pygame.draw.line(self.screen, 'green', point2, endpoint, 2)
+                pygame.draw.circle(self.screen, 'white', point2, 3)
 
-            pygame.draw.circle(self.screen, 'white', self.point1, 5, 1)
-            pygame.draw.line(self.screen, 'white', self.point1, point2, 1)
+            pygame.draw.circle(self.screen, 'white', self.point1, 5)
+            pygame.draw.line(self.screen, 'white', self.point1, point2, 2)
 
         self.updateMasses()
 

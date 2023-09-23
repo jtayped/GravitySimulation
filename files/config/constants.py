@@ -1,5 +1,5 @@
 # Game properties
-WIDTH, HEIGHT = 750, 750
+WIDTH, HEIGHT = 1366, 768
 FPS = 60
 
 # Game values
